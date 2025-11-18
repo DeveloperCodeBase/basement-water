@@ -23,7 +23,7 @@ const Sidebar: FC<Props> = ({ currentView, onNavigate, collapsed, onToggle }) =>
   return (
     <aside
       className={clsx(
-        'bg-white shadow-lg border-s border-slate-100 flex flex-col transition-all duration-300',
+        'bg-white shadow-lg border-l border-slate-100 flex flex-col transition-all duration-300',
         collapsed ? 'w-20' : 'w-64'
       )}
     >
