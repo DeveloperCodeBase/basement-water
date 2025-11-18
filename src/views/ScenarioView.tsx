@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { scenarioTable } from '../data/mockData';
+import { formatNumber, toPersianDigits } from '../utils/format';
 
 const ScenarioView = () => {
   const [withdrawChange, setWithdrawChange] = useState(0);
@@ -17,9 +18,9 @@ const ScenarioView = () => {
       deficit: Math.round(row.deficit * factor * (idx === 1 ? 0.85 : idx === 2 ? 1.3 : 1)),
     }));
     setTableData(newData);
-    const declineText = (newData[1].decline * -1).toFixed(1);
+    const declineText = formatNumber(Math.abs(newData[1].decline), { maximumFractionDigits: 1, minimumFractionDigits: 1 });
     setSummary(
-      `با کاهش ${withdrawChange}% در برداشت و تغییر ${rainChange}% در بارش، انتظار می‌رود سطح آب زیرزمینی به طور متوسط ${declineText} متر دیگر در ${horizon} تغییر کند.`
+      `با تغییر ${toPersianDigits(withdrawChange)}٪ در برداشت و ${toPersianDigits(rainChange)}٪ در بارش، انتظار می‌رود سطح آب زیرزمینی به طور متوسط ${declineText} متر دیگر در ${horizon} تغییر کند.`
     );
   };
 
@@ -32,12 +33,12 @@ const ScenarioView = () => {
         <label className="text-sm text-slate-600 flex flex-col gap-2">
           تغییر در برداشت آب زیرزمینی (%)
           <input type="range" min="-50" max="50" value={withdrawChange} onChange={(e) => setWithdrawChange(Number(e.target.value))} />
-          <span className="text-xs text-slate-500">{withdrawChange}%</span>
+          <span className="text-xs text-slate-500">{toPersianDigits(withdrawChange)}٪</span>
         </label>
         <label className="text-sm text-slate-600 flex flex-col gap-2">
           تغییر در بارش سالانه (%)
           <input type="range" min="-30" max="30" value={rainChange} onChange={(e) => setRainChange(Number(e.target.value))} />
-          <span className="text-xs text-slate-500">{rainChange}%</span>
+          <span className="text-xs text-slate-500">{toPersianDigits(rainChange)}٪</span>
         </label>
         <label className="text-sm text-slate-600 flex flex-col gap-2">
           افق زمانی سناریو
@@ -61,8 +62,8 @@ const ScenarioView = () => {
             <BarChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="name" />
-              <YAxis tickFormatter={(v) => `${v} متر`} />
-              <Tooltip formatter={(value: number) => `${value} متر`} />
+              <YAxis tickFormatter={(v) => `${formatNumber(v, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} label={{ value: 'افت تجمعی (متر)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip formatter={(value: number) => `${formatNumber(value, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} />
               <Bar dataKey="value" fill="#15AABF" radius={[8, 8, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -80,8 +81,8 @@ const ScenarioView = () => {
               {tableData.map((row) => (
                 <tr key={row.name} className="border-b last:border-b-0">
                   <td className="py-3">{row.name}</td>
-                  <td className="py-3">{row.decline}</td>
-                  <td className="py-3">{row.deficit}</td>
+                  <td className="py-3">{formatNumber(row.decline, { maximumFractionDigits: 1, minimumFractionDigits: 1 })}</td>
+                  <td className="py-3">{formatNumber(row.deficit, { maximumFractionDigits: 0, minimumFractionDigits: 0 })}</td>
                 </tr>
               ))}
             </tbody>

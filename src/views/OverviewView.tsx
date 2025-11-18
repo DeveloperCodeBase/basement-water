@@ -13,6 +13,7 @@ import {
 } from 'recharts';
 import { alerts, declineByPlain, initialWaterLevelSeries } from '../data/mockData';
 import KpiCard from '../components/KpiCard';
+import { formatNumber, toPersianDigits } from '../utils/format';
 
 const OverviewView = () => {
   const [series, setSeries] = useState(initialWaterLevelSeries);
@@ -23,7 +24,7 @@ const OverviewView = () => {
         const last = prev[prev.length - 1];
         const nextValue = last.observed + (Math.random() * 0.6 - 0.3);
         const newItem = {
-          name: `بازه جدید ${prev.length + 1}`,
+          name: `بازه جدید ${toPersianDigits(prev.length + 1)}`,
           observed: parseFloat(nextValue.toFixed(2)),
           ai: parseFloat((nextValue - 0.4 + Math.random() * 0.5).toFixed(2)),
         };
@@ -64,9 +65,9 @@ const OverviewView = () => {
             <ResponsiveContainer>
               <LineChart data={series}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={1} />
-                <YAxis tickFormatter={(v) => `${v} متر`} />
-                <Tooltip formatter={(value: number) => `${value} متر`} />
+                <XAxis dataKey="name" tick={{ fontSize: 12 }} interval={1} label={{ value: 'زمان', position: 'insideBottom', offset: -5 }} />
+                <YAxis tickFormatter={(v) => `${formatNumber(v, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} label={{ value: 'ارتفاع سطح آب (متر)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip formatter={(value: number) => `${formatNumber(value, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} متر`} />
                 <Legend verticalAlign="top" />
                 <Line type="monotone" dataKey="observed" name="مشاهدات واقعی" stroke="#1C7ED6" strokeWidth={3} dot={false} />
                 <Line type="monotone" dataKey="ai" name="پیش‌بینی مدل هوش مصنوعی" stroke="#15AABF" strokeDasharray="5 5" strokeWidth={3} dot={false} />
@@ -109,9 +110,9 @@ const OverviewView = () => {
           <ResponsiveContainer>
             <BarChart data={declineByPlain}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="name" />
-              <YAxis tickFormatter={(v) => `${v} متر`} />
-              <Tooltip formatter={(value: number) => `${value} متر`} />
+              <XAxis dataKey="name" label={{ value: 'نام دشت', position: 'insideBottom', offset: -5 }} />
+              <YAxis tickFormatter={(v) => `${formatNumber(v, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} label={{ value: 'افت متوسط (متر)', angle: -90, position: 'insideLeft' }} />
+              <Tooltip formatter={(value: number) => `${formatNumber(value, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} />
               <Bar dataKey="value" fill="#1C7ED6" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

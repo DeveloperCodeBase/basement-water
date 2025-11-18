@@ -18,7 +18,7 @@ const ReportsView = () => {
       id: Date.now(),
       name: `گزارش ${form.type} ${form.plain} – ${form.range}`,
       date: 'امروز',
-      creator: 'demo',
+      creator: 'کارشناس سامانه',
     };
     setReports((prev) => [newReport, ...prev]);
     setDrawerOpen(false);

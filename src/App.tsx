@@ -53,7 +53,7 @@ const App = () => {
   return (
     <div className="min-h-screen bg-slate-50" dir="rtl">
       <TopBar />
-      <div className="flex">
+      <div className="flex flex-row-reverse">
         <div className="hidden lg:flex">{sidebarElement}</div>
         <main className="flex-1 p-4 md:p-6 space-y-6">
           <div className="lg:hidden">
@@ -68,7 +68,7 @@ const App = () => {
         </main>
       </div>
       {mobileSidebar && (
-        <div className="fixed inset-0 bg-black/40 z-40 flex" onClick={() => setMobileSidebar(false)}>
+        <div className="fixed inset-0 bg-black/40 z-40 flex justify-end" onClick={() => setMobileSidebar(false)}>
           <div className="w-72 max-w-full" onClick={(e) => e.stopPropagation()}>
             {sidebarElement}
           </div>

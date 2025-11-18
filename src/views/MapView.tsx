@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { wellMarkers } from '../data/mockData';
+import { formatNumber } from '../utils/format';
 
 const statusColors: Record<string, string> = {
   normal: '#2f9e44',
@@ -110,8 +111,8 @@ const MapView = () => {
                 </button>
               </div>
               <p className="text-slate-500">{selectedWell.aquifer}</p>
-              <p>آخرین سطح آب: {selectedWell.waterLevel} متر</p>
-              <p>نرخ افت سالانه: {selectedWell.decline} متر</p>
+              <p>آخرین سطح آب: {formatNumber(selectedWell.waterLevel, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر</p>
+              <p>نرخ افت سالانه: {formatNumber(selectedWell.decline, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} متر</p>
               <div>
                 <p className="text-xs text-slate-400 mb-1">روند ۱۲ ماه اخیر</p>
                 <svg viewBox="0 0 100 30" className="w-full h-16 text-primary">

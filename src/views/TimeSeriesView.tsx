@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, CartesianGrid } from 'recharts';
+import { formatNumber, toPersianDigits } from '../utils/format';
 
 const wellOptions = ['چاه-۱', 'چاه-۲', 'چاه-۳', 'چاه-۴'];
 const metricOptions = [
@@ -18,7 +19,7 @@ const TimeSeriesView = () => {
     return Array.from({ length: 24 }, (_, idx) => {
       const base = -20 - Math.sin(idx / 3) * 3 - idx * 0.2;
       return {
-        name: `ماه ${idx + 1}`,
+        name: `ماه ${toPersianDigits(idx + 1)}`,
         level: parseFloat((base + Math.random()).toFixed(2)),
         rain: Math.max(0, Math.sin(idx / 2) * 20 + 40 + Math.random() * 10),
         withdraw: 80 + Math.cos(idx / 3) * 15 + Math.random() * 5,
@@ -28,10 +29,16 @@ const TimeSeriesView = () => {
 
   const levelValues = data.map((d) => d.level);
   const stats = {
-    min: Math.min(...levelValues).toFixed(2),
-    max: Math.max(...levelValues).toFixed(2),
-    avg: (levelValues.reduce((sum, v) => sum + v, 0) / levelValues.length).toFixed(2),
-    decline: (levelValues[levelValues.length - 1] - levelValues[0]).toFixed(2),
+    min: formatNumber(Math.min(...levelValues), { maximumFractionDigits: 2, minimumFractionDigits: 2 }),
+    max: formatNumber(Math.max(...levelValues), { maximumFractionDigits: 2, minimumFractionDigits: 2 }),
+    avg: formatNumber(levelValues.reduce((sum, v) => sum + v, 0) / levelValues.length, {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }),
+    decline: formatNumber(levelValues[levelValues.length - 1] - levelValues[0], {
+      maximumFractionDigits: 2,
+      minimumFractionDigits: 2,
+    }),
   };
 
   const toggleMetric = (key: string) => {
@@ -81,9 +88,12 @@ const TimeSeriesView = () => {
           <ResponsiveContainer>
             <LineChart data={data}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip formatter={(value: number) => value.toFixed(2)} labelFormatter={(label) => `زمان: ${label}`} />
+              <XAxis dataKey="name" label={{ value: 'زمان', position: 'insideBottom', offset: -5 }} />
+              <YAxis tickFormatter={(value) => formatNumber(value, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} label={{ value: 'مقدار', angle: -90, position: 'insideLeft' }} />
+              <Tooltip
+                formatter={(value: number) => formatNumber(value, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}
+                labelFormatter={(label) => `زمان: ${label}`}
+              />
               <Legend />
               {metricOptions.map(
                 (metric) =>

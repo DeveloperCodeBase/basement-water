@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { wellsTable } from '../data/mockData';
+import { formatNumber, toPersianDigits } from '../utils/format';
 
 const PAGE_SIZE = 8;
 
@@ -82,8 +83,8 @@ const WellsTableView = () => {
                 <td className="py-3 font-semibold text-slate-800">{well.id}</td>
                 <td className="py-3">{well.aquifer}</td>
                 <td className="py-3">{well.type}</td>
-                <td className="py-3">{well.level}</td>
-                <td className="py-3">{well.decline}</td>
+                <td className="py-3">{formatNumber(well.level, { maximumFractionDigits: 1, minimumFractionDigits: 1 })}</td>
+                <td className="py-3">{formatNumber(well.decline, { maximumFractionDigits: 2, minimumFractionDigits: 2 })}</td>
                 <td className="py-3">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -104,7 +105,7 @@ const WellsTableView = () => {
       </div>
       <div className="flex items-center justify-between text-sm text-slate-600">
         <span>
-          صفحه {page + 1} از {totalPages}
+          صفحه {toPersianDigits(page + 1)} از {toPersianDigits(totalPages)}
         </span>
         <div className="flex gap-2">
           <button

@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Area, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { formatNumber, toPersianDigits } from '../utils/format';
 
 const wells = ['چاه-۱۱', 'چاه-۲۵', 'چاه-۳۲'];
 const models = ['LSTM', 'Random Forest'];
@@ -14,11 +15,11 @@ const AiPredictionView = () => {
       const base = -20 - idx * 0.4 + Math.sin(idx / 2) * 0.7;
       const future = idx >= 15 ? base - 0.5 + Math.random() * 0.5 : base;
       return {
-        name: idx < 15 ? `ماه ${idx + 1}` : `پیش‌بینی ${idx - 14}`,
+        name: idx < 15 ? `ماه ${toPersianDigits(idx + 1)}` : `پیش‌بینی ${toPersianDigits(idx - 14)}`,
         observed: idx < 15 ? parseFloat(base.toFixed(2)) : null,
         predicted: parseFloat(future.toFixed(2)),
-        upper: future + 0.7,
-        lower: future - 0.7,
+        bandBase: future - 0.7,
+        bandHeight: 1.4,
       };
     });
   }, [selectedWell, selectedModel]);
@@ -53,26 +54,41 @@ const AiPredictionView = () => {
           <h3 className="text-lg font-semibold text-slate-800 mb-4">پیش‌بینی سطح آب زیرزمینی</h3>
           <div className="h-80">
             <ResponsiveContainer>
-              <LineChart data={data}>
+              <ComposedChart data={data}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-                <XAxis dataKey="name" interval={1} />
-                <YAxis tickFormatter={(v) => `${v} متر`} />
-                <Tooltip formatter={(value: number) => `${value} متر`} />
+                <XAxis dataKey="name" interval={1} label={{ value: 'زمان', position: 'insideBottom', offset: -5 }} />
+                <YAxis
+                  tickFormatter={(v) => `${formatNumber(v, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`}
+                  label={{ value: 'سطح آب (متر)', angle: -90, position: 'insideLeft' }}
+                />
+                <Tooltip formatter={(value: number) => `${formatNumber(value, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} متر`} />
                 {showUncertainty && (
-                  <Area
-                    type="monotone"
-                    dataKey="upper"
-                    stroke="none"
-                    fill="rgba(21,170,191,0.15)"
-                    activeDot={false}
-                    dot={false}
-                    isAnimationActive={false}
-                    baseLine={(entry: { lower: number }) => entry.lower}
-                  />
+                  <>
+                    <Area
+                      type="monotone"
+                      dataKey="bandBase"
+                      stackId="uncertainty"
+                      stroke="none"
+                      fill="transparent"
+                      isAnimationActive={false}
+                      activeDot={false}
+                      dot={false}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="bandHeight"
+                      stackId="uncertainty"
+                      stroke="none"
+                      fill="rgba(21,170,191,0.15)"
+                      isAnimationActive={false}
+                      activeDot={false}
+                      dot={false}
+                    />
+                  </>
                 )}
                 <Line type="monotone" dataKey="observed" stroke="#1C7ED6" strokeWidth={3} name="مشاهدات گذشته" dot={false} />
                 <Line type="monotone" dataKey="predicted" stroke="#F59F00" strokeDasharray="5 5" strokeWidth={3} name="پیش‌بینی مدل" dot={false} />
-              </LineChart>
+              </ComposedChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -93,8 +109,8 @@ const AiPredictionView = () => {
             </div>
           </div>
           <p className="text-xs text-slate-500 leading-6">
-            مدل {selectedModel} پس از کالیبراسیون روی داده‌های پایش چاه {selectedWell} قادر است روند افت را با دقت بالا پیش‌بینی
-            کند. محدوده عدم قطعیت ترکیبی از خطای یادگیری و تغییرات اقلیمی در نظر گرفته شده است.
+            مدل {selectedModel} پس از کالیبراسیون روی داده‌های پایش {selectedWell} قادر است روند افت را با دقت بالا پیش‌بینی کند و محدوده عدم
+            قطعیت با استفاده از توزیع خطای تاریخی تخمین زده شده است.
           </p>
         </div>
       </div>

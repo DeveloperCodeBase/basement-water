@@ -25,12 +25,12 @@ export const declineByPlain = [
 ];
 
 export const wellMarkers = [
-  { id: 'SMN-01', aquifer: 'دشت سمنان', type: 'monitor', status: 'normal', waterLevel: -24.5, decline: -0.8, x: 40, y: 35 },
-  { id: 'SMN-05', aquifer: 'دشت سمنان', type: 'extraction', status: 'warning', waterLevel: -28.1, decline: -1.3, x: 55, y: 30 },
-  { id: 'GRM-12', aquifer: 'دشت گرمسار', type: 'monitor', status: 'critical', waterLevel: -31.4, decline: -1.8, x: 30, y: 45 },
-  { id: 'DMG-03', aquifer: 'دشت دامغان', type: 'monitor', status: 'normal', waterLevel: -22.0, decline: -0.6, x: 60, y: 55 },
-  { id: 'SHR-07', aquifer: 'دشت شاهرود', type: 'extraction', status: 'warning', waterLevel: -27.3, decline: -1.1, x: 45, y: 65 },
-  { id: 'ARD-09', aquifer: 'دشت آرادان', type: 'monitor', status: 'critical', waterLevel: -33.2, decline: -2.0, x: 25, y: 60 },
+  { id: 'چاه-۰۱', aquifer: 'دشت سمنان', type: 'monitor', status: 'normal', waterLevel: -24.5, decline: -0.8, x: 40, y: 35 },
+  { id: 'چاه-۰۵', aquifer: 'دشت سمنان', type: 'extraction', status: 'warning', waterLevel: -28.1, decline: -1.3, x: 55, y: 30 },
+  { id: 'چاه-۱۲', aquifer: 'دشت گرمسار', type: 'monitor', status: 'critical', waterLevel: -31.4, decline: -1.8, x: 30, y: 45 },
+  { id: 'چاه-۲۰', aquifer: 'دشت دامغان', type: 'monitor', status: 'normal', waterLevel: -22.0, decline: -0.6, x: 60, y: 55 },
+  { id: 'چاه-۲۷', aquifer: 'دشت شاهرود', type: 'extraction', status: 'warning', waterLevel: -27.3, decline: -1.1, x: 45, y: 65 },
+  { id: 'چاه-۳۳', aquifer: 'دشت آرادان', type: 'monitor', status: 'critical', waterLevel: -33.2, decline: -2.0, x: 25, y: 60 },
 ];
 
 export const wellsTable = Array.from({ length: 32 }, (_, idx) => {
@@ -39,7 +39,7 @@ export const wellsTable = Array.from({ length: 32 }, (_, idx) => {
   const type = idx % 2 === 0 ? 'پایش' : 'بهره‌برداری';
   const status = statuses[idx % statuses.length];
   return {
-    id: `چاه-${idx + 1}`,
+    id: `چاه-${(idx + 1).toLocaleString('fa-IR', { useGrouping: false })}`,
     aquifer: plains[idx % plains.length],
     type,
     level: parseFloat((-20 - Math.random() * 15).toFixed(1)),
@@ -53,19 +53,19 @@ export const reportList = [
     id: 1,
     name: 'گزارش ماهانه وضعیت دشت سمنان – فروردین ۱۴۰۳',
     date: '۱۴۰۳/۰۲/۱۰',
-    creator: 'sameni',
+    creator: 'حسام سمنانی',
   },
   {
     id: 2,
     name: 'گزارش فصلی پایش دشت گرمسار – بهار ۱۴۰۳',
     date: '۱۴۰۳/۰۴/۰۲',
-    creator: 'rahimi',
+    creator: 'لیلا رحیمی',
   },
   {
     id: 3,
     name: 'گزارش سالانه وضعیت آبخوان دامغان – ۱۴۰۲',
     date: '۱۴۰۳/۰۱/۲۵',
-    creator: 'moradi',
+    creator: 'مهدی مرادی',
   },
 ];
 

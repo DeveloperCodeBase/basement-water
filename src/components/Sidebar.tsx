@@ -53,7 +53,7 @@ const Sidebar: FC<Props> = ({ currentView, onNavigate, collapsed, onToggle }) =>
         </ul>
       </nav>
       <div className="px-4 py-4 text-xs text-slate-500 border-t border-slate-100">
-        نسخه نمایشی ۱.۰
+        نسخه نمایشی ۱٫۰
       </div>
     </aside>
   );

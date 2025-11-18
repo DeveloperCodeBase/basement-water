@@ -2,8 +2,8 @@ import { FC } from 'react';
 
 const TopBar: FC = () => {
   return (
-    <header className="bg-white shadow-sm border-b border-slate-100 px-6 py-3 flex items-center justify-between">
-      <div className="flex items-center gap-3">
+    <header className="bg-white shadow-sm border-b border-slate-100 px-6 py-3 flex items-center justify-between flex-row-reverse">
+      <div className="flex items-center gap-3 text-right">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white font-semibold">
           💧
         </div>
