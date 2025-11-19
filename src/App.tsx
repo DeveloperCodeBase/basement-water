@@ -38,10 +38,10 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
-      <div className="flex flex-row-reverse min-h-screen">
+    <div className="h-screen bg-slate-50" dir="rtl">
+      <div className="flex h-full flex-row-reverse">
         <div className="hidden lg:flex lg:flex-shrink-0">
-          <div className="w-72 xl:w-80 border-s border-slate-100 bg-white">
+          <div className="w-64 xl:w-72 border-l border-slate-100 bg-white">
             <Sidebar
               currentView={currentView}
               onNavigate={(view) => {
@@ -51,7 +51,7 @@ const App = () => {
             />
           </div>
         </div>
-        <div className="flex-1 flex flex-col min-h-screen">
+        <div className="flex-1 flex flex-col h-full">
           <TopBar onToggleMenu={() => setMobileSidebar(true)} />
           <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-5 lg:py-6 space-y-6">
             {renderView()}
@@ -61,7 +61,7 @@ const App = () => {
       {mobileSidebar && (
         <div className="fixed inset-0 z-40 flex justify-end lg:hidden" aria-modal="true" role="dialog">
           <div className="flex-1 bg-slate-900/40" onClick={() => setMobileSidebar(false)}></div>
-          <div className="w-72 max-w-[85%] h-full bg-white shadow-2xl border-s border-slate-100 transform transition-transform duration-300 translate-x-0">
+          <div className="w-64 max-w-[85%] h-full bg-white shadow-2xl border-l border-slate-100 transform transition-transform duration-300 translate-x-0">
             <Sidebar
               currentView={currentView}
               onNavigate={(view) => {

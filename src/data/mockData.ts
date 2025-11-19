@@ -1,6 +1,16 @@
 import { GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
 import { addDays, nowJalaliIso } from '../utils/date';
 import { AlertRecord } from '../types/alerts';
+import { formatNumber } from '../utils/format';
+
+export type TrendDirection = 'up' | 'down';
+
+export interface OverviewKpi {
+  title: string;
+  value: string;
+  trend?: TrendDirection;
+  trendText: string;
+}
 
 export const mockWells: GroundwaterWell[] = [
   {
@@ -124,12 +134,34 @@ export const alerts: AlertRecord[] = [
   },
 ];
 
-export const overviewStats = {
+const formatKpiValue = (value: number, unit: string, options?: Intl.NumberFormatOptions) =>
+  `${formatNumber(value, options)} ${unit}`;
+
+export const overviewStats: { kpis: OverviewKpi[]; declineByPlain: { name: string; value: number }[] } = {
   kpis: [
-    { label: 'میانگین سطح آب زیرزمینی', value: -23.4, unit: 'متر', trend: 'down' },
-    { label: 'افت متوسط سالانه', value: -0.65, unit: 'متر/سال', trend: 'down' },
-    { label: 'تعداد چاه‌های پایش فعال', value: mockWells.length, unit: 'چاه', trend: 'up' },
-    { label: 'مناطق در وضعیت بحرانی', value: 5, unit: 'منطقه', trend: 'flat' },
+    {
+      title: 'میانگین سطح آب زیرزمینی',
+      value: formatKpiValue(-23.4, 'متر'),
+      trend: 'down',
+      trendText: 'روند کاهشی نسبت به ماه گذشته',
+    },
+    {
+      title: 'افت متوسط سالانه',
+      value: formatKpiValue(-0.65, 'متر/سال'),
+      trend: 'down',
+      trendText: 'افت کنترل‌شده در بازه سالانه',
+    },
+    {
+      title: 'تعداد چاه‌های پایش فعال',
+      value: formatKpiValue(mockWells.length, 'چاه', { maximumFractionDigits: 0, minimumFractionDigits: 0 }),
+      trend: 'up',
+      trendText: 'افزایش چاه‌های فعال نسبت به فصل قبل',
+    },
+    {
+      title: 'مناطق در وضعیت بحرانی',
+      value: formatKpiValue(5, 'منطقه', { maximumFractionDigits: 0, minimumFractionDigits: 0 }),
+      trendText: 'ثابت نسبت به ماه پیش',
+    },
   ],
   declineByPlain: [
     { name: 'دشت سمنان', value: -0.9 },

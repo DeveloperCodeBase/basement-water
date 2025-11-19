@@ -1,20 +1,25 @@
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs, { ConfigType, Dayjs } from 'dayjs';
 import jalaliday from 'jalaliday';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
 
+// فعال‌سازی تقویم جلالی برای dayjs
 dayjs.extend(jalaliday);
-dayjs.extend(utc);
-dayjs.extend(timezone);
-dayjs.locale('fa');
-dayjs.tz.setDefault('Asia/Tehran');
 
-type InputValue = string | number | Date | Dayjs;
+// برخی تایپ‌های dayjs متد calendar را روی نمونه‌ها پشتیبانی می‌کنند؛ برای ست کردن حالت پیش‌فرض در زمان اجرا از این کاست استفاده می‌کنیم.
+type JalaliAwareDayjs = typeof dayjs & { calendar?: (cal: string) => void };
+(dayjs as JalaliAwareDayjs).calendar?.('jalali');
 
-export const dayjsJalali = (value?: InputValue) => dayjs(value).tz('Asia/Tehran').calendar('jalali');
+const toJalali = (input?: ConfigType): Dayjs => dayjs(input).calendar('jalali');
 
-export const formatJalali = (value: InputValue, format = 'YYYY/MM/DD') => dayjsJalali(value).format(format);
+export const dayjsJalali = (input?: ConfigType) => toJalali(input);
 
-export const nowJalaliIso = () => dayjsJalali().toDate().toISOString();
+export function formatJalali(input: ConfigType, format: string = 'YYYY/MM/DD'): string {
+  return toJalali(input).format(format);
+}
 
-export const addDays = (value: InputValue, days: number) => dayjsJalali(value).add(days, 'day').toDate().toISOString();
+export function nowJalaliIso(): string {
+  return toJalali().toDate().toISOString();
+}
+
+export function addDays(value: ConfigType, days: number): string {
+  return dayjs(value).add(days, 'day').toISOString();
+}

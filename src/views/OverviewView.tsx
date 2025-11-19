@@ -44,27 +44,11 @@ const OverviewView = () => {
     };
   }, []);
 
-  const kpiData = useMemo(
-    () =>
-      overview.kpis.map((item) => ({
-        title: item.label,
-        value: `${formatNumber(item.value, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} ${item.unit}`,
-        trend: item.trend === 'flat' ? undefined : item.trend === 'up' ? 'up' : 'down',
-        trendText:
-          item.trend === 'up'
-            ? 'روند صعودی کنترل‌شده'
-            : item.trend === 'flat'
-            ? 'بدون تغییر محسوس'
-            : 'روند کاهشی',
-      })),
-    [overview]
-  );
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {kpiData.map((item) => (
-          <KpiCard key={item.title} {...item} />
+        {overview.kpis.map((item) => (
+          <KpiCard key={item.title} title={item.title} value={item.value} trend={item.trend} trendText={item.trendText} />
         ))}
       </div>
 

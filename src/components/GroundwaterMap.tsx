@@ -22,7 +22,7 @@ const GroundwaterMap: FC<Props> = ({ wells, criticalZones, showCriticalLayer, on
   const center: [number, number] = [35.58, 53.39];
 
   return (
-    <div className="relative w-full h-[320px] md:h-[480px] rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+    <div className="relative w-full min-h-[320px] md:min-h-[420px] h-full rounded-2xl overflow-hidden shadow-sm border border-slate-100">
       <MapContainer center={center} zoom={7} className="w-full h-full" scrollWheelZoom>
         <TileLayer
           attribution="&copy; OpenStreetMap contributors"
