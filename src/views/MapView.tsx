@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import GroundwaterMap from '../components/GroundwaterMap';
+import MapErrorBoundary from '../components/MapErrorBoundary';
 import { getAquifers, getWells } from '../services/groundwaterData';
 import { AquiferZone, GroundwaterWell, GroundwaterWellType } from '../types/groundwater';
 import { formatJalali } from '../utils/date';
 import { formatNumber } from '../utils/format';
+import { mockAquifers, mockWells } from '../data/mockData';
 
 const MapView = () => {
   const [wells, setWells] = useState<GroundwaterWell[]>([]);
@@ -12,14 +14,31 @@ const MapView = () => {
   const [showAquiferLayer, setShowAquiferLayer] = useState(true);
   const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
   const [aquifers, setAquifers] = useState<AquiferZone[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
-    Promise.all([getWells(), getAquifers()]).then(([wellsData, aquiferData]) => {
-      if (!isMounted) return;
-      setWells(wellsData);
-      setAquifers(aquiferData);
-    });
+    const fetchData = async () => {
+      try {
+        const [wellsData, aquiferData] = await Promise.all([getWells(), getAquifers()]);
+        if (!isMounted) return;
+        setWells(wellsData);
+        setAquifers(aquiferData);
+        setLoadError(null);
+      } catch (error) {
+        console.error('خطا در دریافت داده‌های نقشه', error);
+        if (!isMounted) return;
+        setWells(mockWells);
+        setAquifers(mockAquifers);
+        setLoadError('دریافت داده‌های نقشه با خطا مواجه شد. داده‌های نمونه نمایش داده می‌شوند.');
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+    fetchData();
     return () => {
       isMounted = false;
     };
@@ -84,7 +103,23 @@ const MapView = () => {
           <h3 className="text-lg font-semibold text-slate-800">نقشه چاه‌ها و وضعیت آبخوان</h3>
           <p className="text-sm text-slate-500">لایه پایه OSM با مختصات WGS84 (EPSG:4326)</p>
         </div>
-        <GroundwaterMap wells={filteredWells} aquifers={aquifers} showAquiferLayer={showAquiferLayer} onSelect={setSelectedWellId} />
+        <MapErrorBoundary>
+          {loading ? (
+            <div className="min-h-[360px] rounded-2xl border border-slate-100 bg-slate-50 animate-pulse" />
+          ) : (
+            <GroundwaterMap
+              wells={filteredWells}
+              aquifers={aquifers}
+              showAquiferLayer={showAquiferLayer}
+              onSelect={setSelectedWellId}
+            />
+          )}
+        </MapErrorBoundary>
+        {loadError && (
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+            {loadError}
+          </div>
+        )}
         {selectedWell && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-2xl border border-slate-100 p-4 bg-slate-50">

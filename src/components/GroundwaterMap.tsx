@@ -1,9 +1,21 @@
 import type { GeoJsonObject } from 'geojson';
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, GeoJSON } from 'react-leaflet';
 import { AquiferZone, GroundwaterWell } from '../types/groundwater';
 import { formatJalali } from '../utils/date';
 import { formatNumber } from '../utils/format';
+
+const ensureResizeObserver = () => {
+  if (typeof window === 'undefined') return;
+  const globalWindow = window as typeof window & { ResizeObserver?: typeof ResizeObserver };
+  if (globalWindow.ResizeObserver) return;
+  class ResizeObserverPolyfill {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  }
+  globalWindow.ResizeObserver = ResizeObserverPolyfill as unknown as typeof ResizeObserver;
+};
 
 type Props = {
   wells: GroundwaterWell[];
@@ -19,6 +31,11 @@ const statusColor: Record<GroundwaterWell['status'], string> = {
 };
 
 const GroundwaterMap: FC<Props> = ({ wells, aquifers, showAquiferLayer, onSelect }) => {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => {
+    ensureResizeObserver();
+    setIsClient(true);
+  }, []);
   const defaultCenter: [number, number] = [35.58, 53.39];
   const validWells = useMemo(
     () =>
@@ -28,6 +45,12 @@ const GroundwaterMap: FC<Props> = ({ wells, aquifers, showAquiferLayer, onSelect
     [wells],
   );
   const center = validWells.length ? ([validWells[0].latitude, validWells[0].longitude] as [number, number]) : defaultCenter;
+
+  if (!isClient) {
+    return (
+      <div className="min-h-[320px] rounded-2xl border border-slate-100 bg-slate-100/50 animate-pulse" />
+    );
+  }
 
   return (
     <div className="relative w-full h-full min-h-[320px] rounded-2xl overflow-hidden shadow-sm border border-slate-100">

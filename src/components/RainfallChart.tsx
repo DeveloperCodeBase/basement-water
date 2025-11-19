@@ -6,6 +6,7 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Legend,
 } from 'recharts';
 
 type RainfallPoint = {
@@ -38,8 +39,9 @@ const RainfallChart = () => {
             <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
             <XAxis dataKey="month" label={{ value: 'ماه', position: 'insideBottom', offset: -5 }} />
             <YAxis tickFormatter={(value) => `${value} میلی‌متر`} label={{ value: 'بارش (میلی‌متر)', angle: -90, position: 'insideLeft' }} />
-            <Tooltip formatter={(value: number) => `${value} میلی‌متر`} />
-            <Bar dataKey="rainfall_mm" fill="#15AABF" radius={[6, 6, 0, 0]} name="بارش" />
+            <Tooltip formatter={(value: number) => `${value} میلی‌متر`} contentStyle={{ borderRadius: '12px' }} />
+            <Legend wrapperStyle={{ fontSize: 12 }} />
+            <Bar dataKey="rainfall_mm" fill="#0891b2" radius={[6, 6, 0, 0]} name="بارش (میلی‌متر)" />
           </BarChart>
         </ResponsiveContainer>
       </div>
