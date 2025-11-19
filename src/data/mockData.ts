@@ -1,4 +1,4 @@
-import { GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
+import { AquiferZone, GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
 import { addDays, nowJalaliIso } from '../utils/date';
 import { AlertRecord } from '../types/alerts';
 import { formatNumber } from '../utils/format';
@@ -69,27 +69,59 @@ export const mockMeasurements: GroundwaterMeasurement[] = mockWells.flatMap((wel
   });
 });
 
-export const mockCriticalZones: GeoJSON.FeatureCollection = {
-  type: 'FeatureCollection',
-  features: [
-    {
-      type: 'Feature',
-      properties: { name: 'منطقه بحرانی سمنان' },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [
-          [
-            [53.1, 35.5],
-            [53.5, 35.5],
-            [53.6, 35.8],
-            [53.2, 35.9],
-            [53.1, 35.5],
-          ],
+export const mockAquifers: AquiferZone[] = [
+  {
+    id: 'aq-semnan',
+    name: 'آبخوان سمنان',
+    status: 'warning',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [53.15, 35.4],
+          [53.7, 35.4],
+          [53.85, 35.85],
+          [53.28, 35.95],
+          [53.15, 35.4],
         ],
-      },
+      ],
     },
-  ],
-};
+  },
+  {
+    id: 'aq-garmsar',
+    name: 'آبخوان گرمسار',
+    status: 'critical',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [52.15, 35.05],
+          [52.5, 35.05],
+          [52.65, 35.4],
+          [52.2, 35.45],
+          [52.15, 35.05],
+        ],
+      ],
+    },
+  },
+  {
+    id: 'aq-damghan',
+    name: 'آبخوان دامغان',
+    status: 'normal',
+    geometry: {
+      type: 'Polygon',
+      coordinates: [
+        [
+          [54.2, 35.9],
+          [54.55, 35.9],
+          [54.65, 36.2],
+          [54.25, 36.25],
+          [54.2, 35.9],
+        ],
+      ],
+    },
+  },
+];
 
 export const alerts: AlertRecord[] = [
   {

@@ -1,21 +1,19 @@
-import { GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
-import {
-  mockWells,
-  mockMeasurements,
-  mockCriticalZones,
-  overviewStats,
-} from '../data/mockData';
+import type { Feature, FeatureCollection as GeoFeatureCollection, GeoJsonProperties, Geometry } from 'geojson';
+import { AquiferZone, GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
+import { mockWells, mockMeasurements, mockAquifers, overviewStats } from '../data/mockData';
 
-type FeatureCollection = GeoJSON.FeatureCollection<GeoJSON.Geometry, GeoJSON.GeoJsonProperties>;
+type FeatureCollection = GeoFeatureCollection<Geometry, GeoJsonProperties>;
 
 type DataConfig = {
   wellsUrl?: string;
   measurementsUrl?: string;
+  aquifersUrl?: string;
 };
 
 const dataConfig: DataConfig = {
   wellsUrl: '/data/semnan-wells.geojson',
   measurementsUrl: '/data/semnan-measurements.json',
+  aquifersUrl: '/data/semnan-aquifers.geojson',
 };
 
 let hasLoggedDataFallback = false;
@@ -44,7 +42,7 @@ const fetchJson = async <T>(url?: string): Promise<T | null> => {
   }
 };
 
-const featureToWell = (feature: GeoJSON.Feature): GroundwaterWell | null => {
+const featureToWell = (feature: Feature): GroundwaterWell | null => {
   if (!feature.geometry || feature.geometry.type !== 'Point') return null;
   const [longitude, latitude] = feature.geometry.coordinates as [number, number];
   const properties = feature.properties || {};
@@ -64,6 +62,18 @@ const featureToWell = (feature: GeoJSON.Feature): GroundwaterWell | null => {
   };
 };
 
+const featureToAquifer = (feature: Feature): AquiferZone | null => {
+  if (!feature.geometry) return null;
+  if (feature.geometry.type !== 'Polygon' && feature.geometry.type !== 'MultiPolygon') return null;
+  const properties = feature.properties || {};
+  return {
+    id: (properties.id as string) || String(feature.id || Math.random()),
+    name: (properties.name as string) || 'آبخوان بدون نام',
+    status: (properties.status as AquiferZone['status']) || 'normal',
+    geometry: feature.geometry as AquiferZone['geometry'],
+  };
+};
+
 export const getWells = async (): Promise<GroundwaterWell[]> => {
   const featureCollection = await fetchJson<FeatureCollection>(dataConfig.wellsUrl);
   if (featureCollection?.features?.length) {
@@ -80,6 +90,14 @@ export const getWellTimeSeries = async (wellId: string): Promise<GroundwaterMeas
   return source.filter((item) => item.wellId === wellId);
 };
 
-export const getCriticalZones = () => mockCriticalZones;
+export const getAquifers = async (): Promise<AquiferZone[]> => {
+  const featureCollection = await fetchJson<FeatureCollection>(dataConfig.aquifersUrl);
+  if (featureCollection?.features?.length) {
+    return featureCollection.features
+      .map((feature) => featureToAquifer(feature))
+      .filter((item): item is AquiferZone => Boolean(item));
+  }
+  return mockAquifers;
+};
 
 export const getOverviewStats = () => overviewStats;

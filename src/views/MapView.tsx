@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import GroundwaterMap from '../components/GroundwaterMap';
-import { getCriticalZones, getWells } from '../services/groundwaterData';
-import { GroundwaterWell, GroundwaterWellType } from '../types/groundwater';
+import { getAquifers, getWells } from '../services/groundwaterData';
+import { AquiferZone, GroundwaterWell, GroundwaterWellType } from '../types/groundwater';
 import { formatJalali } from '../utils/date';
 import { formatNumber } from '../utils/format';
 
@@ -9,12 +9,20 @@ const MapView = () => {
   const [wells, setWells] = useState<GroundwaterWell[]>([]);
   const [selectedPlain, setSelectedPlain] = useState('همه دشت‌ها');
   const [typeFilter, setTypeFilter] = useState<GroundwaterWellType>('monitoring');
-  const [showCriticalLayer, setShowCriticalLayer] = useState(true);
+  const [showAquiferLayer, setShowAquiferLayer] = useState(true);
   const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
-  const criticalZones = getCriticalZones();
+  const [aquifers, setAquifers] = useState<AquiferZone[]>([]);
 
   useEffect(() => {
-    getWells().then(setWells);
+    let isMounted = true;
+    Promise.all([getWells(), getAquifers()]).then(([wellsData, aquiferData]) => {
+      if (!isMounted) return;
+      setWells(wellsData);
+      setAquifers(aquiferData);
+    });
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const plains = useMemo(() => ['همه دشت‌ها', ...Array.from(new Set(wells.map((well) => well.plain)))], [wells]);
@@ -30,7 +38,7 @@ const MapView = () => {
   const selectedWell = wells.find((well) => well.id === selectedWellId);
 
   return (
-    <div className="space-y-5">
+    <div className="flex flex-col gap-5">
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <label className="flex flex-col text-sm text-slate-600">
@@ -65,7 +73,7 @@ const MapView = () => {
             </div>
           </div>
           <label className="flex items-center gap-2 text-sm text-slate-600">
-            <input type="checkbox" checked={showCriticalLayer} onChange={(e) => setShowCriticalLayer(e.target.checked)} />
+            <input type="checkbox" checked={showAquiferLayer} onChange={(e) => setShowAquiferLayer(e.target.checked)} />
             نمایش لایه مناطق بحرانی
           </label>
         </div>
@@ -76,12 +84,7 @@ const MapView = () => {
           <h3 className="text-lg font-semibold text-slate-800">نقشه چاه‌ها و وضعیت آبخوان</h3>
           <p className="text-sm text-slate-500">لایه پایه OSM با مختصات WGS84 (EPSG:4326)</p>
         </div>
-        <GroundwaterMap
-          wells={filteredWells}
-          criticalZones={criticalZones}
-          showCriticalLayer={showCriticalLayer}
-          onSelect={setSelectedWellId}
-        />
+        <GroundwaterMap wells={filteredWells} aquifers={aquifers} showAquiferLayer={showAquiferLayer} onSelect={setSelectedWellId} />
         {selectedWell && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="rounded-2xl border border-slate-100 p-4 bg-slate-50">

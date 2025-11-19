@@ -1,3 +1,5 @@
+import type { MultiPolygon, Polygon } from 'geojson';
+
 export type GroundwaterStatus = 'normal' | 'warning' | 'critical';
 export type GroundwaterWellType = 'monitoring' | 'extraction';
 
@@ -23,4 +25,11 @@ export interface GroundwaterMeasurement {
   predicted_level_m?: number;
   rain_mm?: number;
   withdrawal_mcm?: number;
+}
+
+export interface AquiferZone {
+  id: string;
+  name: string;
+  status: GroundwaterStatus;
+  geometry: Polygon | MultiPolygon;
 }
