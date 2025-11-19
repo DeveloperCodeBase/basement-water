@@ -18,14 +18,28 @@ const dataConfig: DataConfig = {
   measurementsUrl: '/data/semnan-measurements.json',
 };
 
+let hasLoggedDataFallback = false;
+
+const logFallbackWarning = (error: unknown) => {
+  if (hasLoggedDataFallback) return;
+  console.warn('عدم دسترسی به داده‌های واقعی؛ از مجموعه ساختگی استفاده می‌شود.', error);
+  hasLoggedDataFallback = true;
+};
+
 const fetchJson = async <T>(url?: string): Promise<T | null> => {
   if (!url) return null;
   try {
     const response = await fetch(url);
-    if (!response.ok) return null;
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const contentType = response.headers.get('content-type') || '';
+    if (!contentType.includes('application/json') && !contentType.includes('geo+json')) {
+      throw new Error(`Unsupported content-type: ${contentType || 'unknown'}`);
+    }
     return (await response.json()) as T;
   } catch (error) {
-    console.warn('Failed to load remote data, falling back to mock dataset', error);
+    logFallbackWarning(error);
     return null;
   }
 };

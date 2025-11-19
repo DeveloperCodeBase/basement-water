@@ -5,6 +5,7 @@ import KpiCard from '../components/KpiCard';
 import { formatNumber } from '../utils/format';
 import { getOverviewStats, getWellTimeSeries } from '../services/groundwaterData';
 import { formatJalali } from '../utils/date';
+import AlertItem from '../components/AlertItem';
 
 const OverviewView = () => {
   const [series, setSeries] = useState<{ name: string; observed: number; ai: number }[]>([]);
@@ -93,19 +94,13 @@ const OverviewView = () => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-slate-800">هشدارهای اخیر</h3>
-            <span className="text-xs text-slate-500">آخرین ۶ مورد</span>
+            <span className="text-xs text-slate-500">آخرین ۵ مورد ثبت‌شده</span>
           </div>
-          <ul className="space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {alerts.map((alert) => (
-              <li key={alert.id} className="flex items-start gap-3">
-                <span className="text-primary text-lg">●</span>
-                <div>
-                  <p className="text-sm text-slate-700">{alert.text}</p>
-                  <p className="text-xs text-slate-400 mt-1">{formatJalali(alert.timestamp)}</p>
-                </div>
-              </li>
+              <AlertItem key={alert.id} {...alert} />
             ))}
-          </ul>
+          </div>
         </div>
       </div>
 

@@ -4,7 +4,7 @@ import { GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
 import { getWellTimeSeries, getWells } from '../services/groundwaterData';
 import { formatNumber } from '../utils/format';
 import JalaliDatePicker from '../components/JalaliDatePicker';
-import { addDays } from '../utils/date';
+import { addDays, formatJalali } from '../utils/date';
 
 const metricOptions = [
   { key: 'water_level_m', label: 'سطح آب زیرزمینی', color: '#1C7ED6' },

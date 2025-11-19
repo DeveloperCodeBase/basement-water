@@ -15,48 +15,38 @@ const menuItems = [
 interface Props {
   currentView: string;
   onNavigate: (view: string) => void;
-  collapsed: boolean;
-  onToggle: () => void;
 }
 
-const Sidebar: FC<Props> = ({ currentView, onNavigate, collapsed, onToggle }) => {
+const Sidebar: FC<Props> = ({ currentView, onNavigate }) => {
   return (
-    <aside
-      className={clsx(
-        'bg-white shadow-lg border-s border-slate-100 flex flex-col transition-all duration-300 h-full',
-        collapsed ? 'w-20' : 'w-64'
-      )}
-    >
-      <button
-        className="mx-4 my-4 py-2 rounded-lg border border-slate-200 text-sm text-slate-600 hover:bg-slate-50"
-        onClick={onToggle}
-      >
-        {collapsed ? 'باز کردن' : 'جمع کردن'}
-      </button>
-      <nav className="flex-1 overflow-y-auto" aria-label="منوی اصلی">
-        <ul className="px-2 space-y-1">
+    <aside className="h-full flex flex-col" aria-label="منوی اصلی">
+      <div className="px-4 py-4 border-b border-slate-100">
+        <p className="text-sm font-medium text-slate-600">دسترسی سریع</p>
+      </div>
+      <nav className="flex-1 overflow-y-auto px-3 py-4">
+        <ul className="space-y-1">
           {menuItems.map((item) => (
             <li key={item.id}>
               <button
                 onClick={() => onNavigate(item.id)}
                 className={clsx(
-                  'w-full flex items-center text-right px-4 py-3 rounded-xl text-sm font-medium gap-2',
-                  collapsed ? 'justify-center' : 'justify-between',
+                  'w-full flex items-center gap-3 flex-row-reverse text-right px-4 py-3 rounded-xl text-sm font-medium',
                   currentView === item.id
                     ? 'bg-gradient-to-l from-primary/90 to-accent/80 text-white shadow'
                     : 'text-slate-600 hover:bg-slate-50'
                 )}
+                aria-current={currentView === item.id ? 'page' : undefined}
               >
-                <span className="text-lg">{item.icon}</span>
-                {!collapsed && <span className="flex-1 text-right">{item.label}</span>}
+                <span className="flex-1">{item.label}</span>
+                <span className="text-lg" aria-hidden>
+                  {item.icon}
+                </span>
               </button>
             </li>
           ))}
         </ul>
       </nav>
-      <div className="px-4 py-4 text-xs text-slate-500 border-t border-slate-100">
-        نسخه نمایشی ۱٫۰
-      </div>
+      <div className="px-4 py-4 text-xs text-slate-500 border-t border-slate-100">نسخه نمایشی ۱٫۰</div>
     </aside>
   );
 };

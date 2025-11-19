@@ -1,5 +1,6 @@
 import { GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
 import { addDays, nowJalaliIso } from '../utils/date';
+import { AlertRecord } from '../types/alerts';
 
 export const mockWells: GroundwaterWell[] = [
   {
@@ -80,12 +81,47 @@ export const mockCriticalZones: GeoJSON.FeatureCollection = {
   ],
 };
 
-export const alerts = [
-  { id: 1, text: 'افزایش سرعت افت در دشت سمنان', timestamp: addDays(new Date().toISOString(), -1) },
-  { id: 2, text: 'افت بیش از حد آستانه در چاه شماره ۲۳', timestamp: addDays(new Date().toISOString(), -2) },
-  { id: 3, text: 'به‌روزرسانی موفق داده‌های پایش', timestamp: addDays(new Date().toISOString(), -3) },
-  { id: 4, text: 'نیاز به بررسی مجدد پمپ چاه ۴۱', timestamp: addDays(new Date().toISOString(), -4) },
-  { id: 5, text: 'اتمام حجم برداشت مجاز در دشت دامغان', timestamp: addDays(new Date().toISOString(), -5) },
+export const alerts: AlertRecord[] = [
+  {
+    id: 1,
+    title: 'افزایش سرعت افت سطح آب',
+    description: 'سرعت افت آبخوان در ایستگاه سمنان از حد آستانه تعیین‌شده عبور کرده است.',
+    plain: 'دشت سمنان',
+    severity: 'warning',
+    timestamp: addDays(new Date().toISOString(), -1),
+  },
+  {
+    id: 2,
+    title: 'افت بحرانی در چاه پایش ۲۳',
+    description: 'سطح آب این چاه ۰٫۸ متر پایین‌تر از مقدار میانگین ماه گذشته ثبت شده است.',
+    plain: 'دشت گرمسار',
+    severity: 'critical',
+    timestamp: addDays(new Date().toISOString(), -2),
+  },
+  {
+    id: 3,
+    title: 'به‌روزرسانی داده‌های بارش',
+    description: 'داده‌های بارش ماهانه از سازمان هواشناسی دریافت و همگام شد.',
+    plain: 'سراسر استان',
+    severity: 'info',
+    timestamp: addDays(new Date().toISOString(), -3),
+  },
+  {
+    id: 4,
+    title: 'نیاز به بازدید میدانی',
+    description: 'پیشنهاد می‌شود تجهیزات برداشت در چاه ۴۱ دامغان بازبینی شوند.',
+    plain: 'دشت دامغان',
+    severity: 'warning',
+    timestamp: addDays(new Date().toISOString(), -4),
+  },
+  {
+    id: 5,
+    title: 'اتمام سهمیه برداشت مجاز',
+    description: 'مصرف تجمعی بهره‌برداران این دشت به سقف مجاز سالانه رسید.',
+    plain: 'دشت آرادان',
+    severity: 'critical',
+    timestamp: addDays(new Date().toISOString(), -5),
+  },
 ];
 
 export const overviewStats = {
