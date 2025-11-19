@@ -6,6 +6,7 @@ import { formatNumber } from '../utils/format';
 import { getOverviewStats, getWellTimeSeries } from '../services/groundwaterData';
 import { formatJalali } from '../utils/date';
 import AlertItem from '../components/AlertItem';
+import RainfallChart from '../components/RainfallChart';
 
 const OverviewView = () => {
   const [series, setSeries] = useState<{ name: string; observed: number; ai: number }[]>([]);
@@ -88,19 +89,22 @@ const OverviewView = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-        <h3 className="text-lg font-semibold text-slate-800 mb-4">افت متوسط سالانه به تفکیک دشت‌ها</h3>
-        <div className="h-64">
-          <ResponsiveContainer>
-            <BarChart data={overview.declineByPlain}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
-              <XAxis dataKey="name" label={{ value: 'نام دشت', position: 'insideBottom', offset: -5 }} />
-              <YAxis tickFormatter={(v) => `${formatNumber(v, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} label={{ value: 'افت متوسط (متر)', angle: -90, position: 'insideLeft' }} />
-              <Tooltip formatter={(value: number) => `${formatNumber(value, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} />
-              <Bar dataKey="value" fill="#1C7ED6" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+          <h3 className="text-lg font-semibold text-slate-800 mb-4">افت متوسط سالانه به تفکیک دشت‌ها</h3>
+          <div className="h-64">
+            <ResponsiveContainer>
+              <BarChart data={overview.declineByPlain}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <XAxis dataKey="name" label={{ value: 'نام دشت', position: 'insideBottom', offset: -5 }} />
+                <YAxis tickFormatter={(v) => `${formatNumber(v, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} label={{ value: 'افت متوسط (متر)', angle: -90, position: 'insideLeft' }} />
+                <Tooltip formatter={(value: number) => `${formatNumber(value, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر`} />
+                <Bar dataKey="value" fill="#1C7ED6" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
+        <RainfallChart />
       </div>
     </div>
   );

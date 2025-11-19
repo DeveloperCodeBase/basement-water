@@ -38,51 +38,47 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50" dir="rtl">
-      <div className="flex min-h-screen flex-row-reverse">
-        <div className="hidden lg:flex lg:flex-shrink-0">
-          <div className="w-64 xl:w-72 border-l border-slate-100 bg-white">
-            <Sidebar
-              currentView={currentView}
-              onNavigate={(view) => {
-                setCurrentView(view);
-                setMobileSidebar(false);
+    <div className="h-screen w-screen bg-slate-50" dir="rtl">
+      <div className="relative flex h-full flex-row-reverse overflow-hidden">
+        <aside className="hidden h-full w-64 shrink-0 border-l border-slate-100 bg-white xl:w-72 lg:block z-20">
+          <Sidebar
+            currentView={currentView}
+            onNavigate={(view) => {
+              setCurrentView(view);
+              setMobileSidebar(false);
+            }}
+          />
+        </aside>
+        {mobileSidebar && (
+          <>
+            <div
+              className="fixed inset-0 z-40 bg-slate-900/50 lg:hidden"
+              onClick={() => setMobileSidebar(false)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  setMobileSidebar(false);
+                }
               }}
-            />
-          </div>
-        </div>
-        <div className="flex flex-1 flex-col min-h-0">
+              aria-label="بستن منوی اصلی"
+              role="button"
+              tabIndex={0}
+            ></div>
+            <aside className="fixed inset-y-0 right-0 z-50 w-64 max-w-[85%] border-l border-slate-100 bg-white shadow-2xl transition-transform duration-300 lg:hidden">
+              <Sidebar
+                currentView={currentView}
+                onNavigate={(view) => {
+                  setCurrentView(view);
+                  setMobileSidebar(false);
+                }}
+              />
+            </aside>
+          </>
+        )}
+        <div className="z-0 flex min-h-0 flex-1 flex-col">
           <TopBar onToggleMenu={() => setMobileSidebar(true)} />
-          <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-5 lg:py-6 space-y-6">
-            {renderView()}
-          </main>
+          <main className="flex-1 space-y-6 overflow-y-auto px-3 py-5 sm:px-6 lg:py-6">{renderView()}</main>
         </div>
       </div>
-      {mobileSidebar && (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
-            onClick={() => setMobileSidebar(false)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter' || event.key === ' ') {
-                setMobileSidebar(false);
-              }
-            }}
-            aria-label="بستن منوی اصلی"
-            role="button"
-            tabIndex={0}
-          ></div>
-          <div className="fixed inset-y-0 right-0 z-50 w-64 max-w-[85%] bg-white shadow-2xl border-l border-slate-100 lg:hidden">
-            <Sidebar
-              currentView={currentView}
-              onNavigate={(view) => {
-                setCurrentView(view);
-                setMobileSidebar(false);
-              }}
-            />
-          </div>
-        </>
-      )}
     </div>
   );
 };

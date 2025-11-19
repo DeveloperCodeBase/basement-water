@@ -30,8 +30,8 @@ const GroundwaterMap: FC<Props> = ({ wells, aquifers, showAquiferLayer, onSelect
   const center = validWells.length ? ([validWells[0].latitude, validWells[0].longitude] as [number, number]) : defaultCenter;
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden shadow-sm border border-slate-100">
-      <MapContainer center={center} zoom={7} className="w-full h-[320px] md:h-[420px] lg:h-[540px]" scrollWheelZoom>
+    <div className="relative w-full h-full min-h-[320px] rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+      <MapContainer center={center} zoom={7} className="h-full w-full" scrollWheelZoom>
         <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {showAquiferLayer &&
           aquifers?.map((aquifer) => (
