@@ -1,6 +1,5 @@
 import { FC } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup, GeoJSON } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 import { GroundwaterWell } from '../types/groundwater';
 import { formatJalali } from '../utils/date';
 import { formatNumber } from '../utils/format';
@@ -22,12 +21,9 @@ const GroundwaterMap: FC<Props> = ({ wells, criticalZones, showCriticalLayer, on
   const center: [number, number] = [35.58, 53.39];
 
   return (
-    <div className="relative w-full min-h-[320px] md:min-h-[420px] h-full rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+    <div className="relative w-full min-h-[320px] lg:min-h-[520px] h-full rounded-2xl overflow-hidden shadow-sm border border-slate-100">
       <MapContainer center={center} zoom={7} className="w-full h-full" scrollWheelZoom>
-        <TileLayer
-          attribution="&copy; OpenStreetMap contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+        <TileLayer attribution="&copy; OpenStreetMap contributors" url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
         {showCriticalLayer && criticalZones && <GeoJSON data={criticalZones} style={{ color: '#f97316', weight: 1, fillOpacity: 0.2 }} />}
         {wells.map((well) => (
           <CircleMarker
@@ -55,9 +51,15 @@ const GroundwaterMap: FC<Props> = ({ wells, criticalZones, showCriticalLayer, on
       </MapContainer>
       <div className="absolute bottom-4 end-4 bg-white/90 rounded-xl px-3 py-2 text-xs text-slate-700 shadow flex flex-col gap-1">
         <span className="font-semibold text-slate-900">راهنمای وضعیت</span>
-        <span className="flex items-center gap-2"><span className="inline-block w-3 h-3 rounded-full bg-emerald-500"></span> عادی</span>
-        <span className="flex items-center gap-2"><span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span> نیاز به توجه</span>
-        <span className="flex items-center gap-2"><span className="inline-block w-3 h-3 rounded-full bg-red-500"></span> بحرانی</span>
+        <span className="flex items-center gap-2">
+          <span className="inline-block w-3 h-3 rounded-full bg-emerald-500"></span> عادی
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="inline-block w-3 h-3 rounded-full bg-orange-500"></span> نیاز به توجه
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="inline-block w-3 h-3 rounded-full bg-red-500"></span> بحرانی
+        </span>
       </div>
     </div>
   );

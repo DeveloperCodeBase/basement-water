@@ -60,8 +60,8 @@ const WellsTableView = () => {
           }}
         />
       </div>
-      <div className="overflow-x-auto">
-        <table className="w-full text-sm text-right min-w-[800px]">
+      <div className="w-full overflow-x-auto">
+        <table className="min-w-max border-separate border-spacing-y-1 w-full text-sm text-right">
           <thead>
             <tr className="text-slate-500 border-b">
               {[

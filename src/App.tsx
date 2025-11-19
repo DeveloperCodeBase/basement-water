@@ -38,8 +38,8 @@ const App = () => {
   };
 
   return (
-    <div className="h-screen bg-slate-50" dir="rtl">
-      <div className="flex h-full flex-row-reverse">
+    <div className="min-h-screen bg-slate-50" dir="rtl">
+      <div className="flex min-h-screen flex-row-reverse">
         <div className="hidden lg:flex lg:flex-shrink-0">
           <div className="w-64 xl:w-72 border-l border-slate-100 bg-white">
             <Sidebar
@@ -51,7 +51,7 @@ const App = () => {
             />
           </div>
         </div>
-        <div className="flex-1 flex flex-col h-full">
+        <div className="flex flex-1 flex-col min-h-0">
           <TopBar onToggleMenu={() => setMobileSidebar(true)} />
           <main className="flex-1 overflow-y-auto px-3 sm:px-6 py-5 lg:py-6 space-y-6">
             {renderView()}
@@ -59,9 +59,20 @@ const App = () => {
         </div>
       </div>
       {mobileSidebar && (
-        <div className="fixed inset-0 z-40 flex justify-end lg:hidden" aria-modal="true" role="dialog">
-          <div className="flex-1 bg-slate-900/40" onClick={() => setMobileSidebar(false)}></div>
-          <div className="w-64 max-w-[85%] h-full bg-white shadow-2xl border-l border-slate-100 transform transition-transform duration-300 translate-x-0">
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm lg:hidden"
+            onClick={() => setMobileSidebar(false)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter' || event.key === ' ') {
+                setMobileSidebar(false);
+              }
+            }}
+            aria-label="بستن منوی اصلی"
+            role="button"
+            tabIndex={0}
+          ></div>
+          <div className="fixed inset-y-0 right-0 z-50 w-64 max-w-[85%] bg-white shadow-2xl border-l border-slate-100 lg:hidden">
             <Sidebar
               currentView={currentView}
               onNavigate={(view) => {
@@ -70,7 +81,7 @@ const App = () => {
               }}
             />
           </div>
-        </div>
+        </>
       )}
     </div>
   );

@@ -80,7 +80,7 @@ const OverviewView = () => {
             <h3 className="text-lg font-semibold text-slate-800">هشدارهای اخیر</h3>
             <span className="text-xs text-slate-500">آخرین ۵ مورد ثبت‌شده</span>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
             {alerts.map((alert) => (
               <AlertItem key={alert.id} {...alert} />
             ))}
