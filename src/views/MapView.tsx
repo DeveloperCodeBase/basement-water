@@ -1,34 +1,38 @@
-import { useMemo, useState } from 'react';
-import { wellMarkers } from '../data/mockData';
+import { useEffect, useMemo, useState } from 'react';
+import GroundwaterMap from '../components/GroundwaterMap';
+import { getCriticalZones, getWells } from '../services/groundwaterData';
+import { GroundwaterWell, GroundwaterWellType } from '../types/groundwater';
+import { formatJalali } from '../utils/date';
 import { formatNumber } from '../utils/format';
 
-const statusColors: Record<string, string> = {
-  normal: '#2f9e44',
-  warning: '#f08c00',
-  critical: '#e03131',
-};
-
 const MapView = () => {
+  const [wells, setWells] = useState<GroundwaterWell[]>([]);
   const [selectedPlain, setSelectedPlain] = useState('همه دشت‌ها');
-  const [typeFilter, setTypeFilter] = useState<'monitor' | 'extraction'>('monitor');
+  const [typeFilter, setTypeFilter] = useState<GroundwaterWellType>('monitoring');
   const [showCriticalLayer, setShowCriticalLayer] = useState(true);
-  const [selectedWell, setSelectedWell] = useState<typeof wellMarkers[0] | null>(null);
+  const [selectedWellId, setSelectedWellId] = useState<string | null>(null);
+  const criticalZones = getCriticalZones();
 
-  const filtered = useMemo(() => {
-    return wellMarkers.filter((well) => {
-      const matchesPlain = selectedPlain === 'همه دشت‌ها' || well.aquifer === selectedPlain;
+  useEffect(() => {
+    getWells().then(setWells);
+  }, []);
+
+  const plains = useMemo(() => ['همه دشت‌ها', ...Array.from(new Set(wells.map((well) => well.plain)))], [wells]);
+
+  const filteredWells = useMemo(() => {
+    return wells.filter((well) => {
+      const matchesPlain = selectedPlain === 'همه دشت‌ها' || well.plain === selectedPlain;
       const matchesType = well.type === typeFilter;
-      const matchesCritical = showCriticalLayer ? true : well.status !== 'critical';
-      return matchesPlain && matchesType && matchesCritical;
+      return matchesPlain && matchesType;
     });
-  }, [selectedPlain, typeFilter, showCriticalLayer]);
+  }, [wells, selectedPlain, typeFilter]);
 
-  const plains = ['همه دشت‌ها', 'دشت سمنان', 'دشت گرمسار', 'دشت دامغان', 'دشت شاهرود', 'دشت آرادان'];
+  const selectedWell = wells.find((well) => well.id === selectedWellId);
 
   return (
     <div className="space-y-5">
       <div className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex flex-col gap-4">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <label className="flex flex-col text-sm text-slate-600">
             انتخاب دشت
             <select
@@ -41,27 +45,25 @@ const MapView = () => {
               ))}
             </select>
           </label>
-          <label className="flex flex-col text-sm text-slate-600">
+          <div className="flex flex-col text-sm text-slate-600">
             نوع چاه
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setTypeFilter('monitor')}
-                className={`px-3 py-2 rounded-xl border text-sm ${
-                  typeFilter === 'monitor' ? 'bg-primary/10 border-primary text-primary' : 'border-slate-200'
-                }`}
-              >
-                نمایش چاه‌های پایش
-              </button>
-              <button
-                onClick={() => setTypeFilter('extraction')}
-                className={`px-3 py-2 rounded-xl border text-sm ${
-                  typeFilter === 'extraction' ? 'bg-primary/10 border-primary text-primary' : 'border-slate-200'
-                }`}
-              >
-                نمایش چاه‌های بهره‌برداری
-              </button>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {[
+                { key: 'monitoring', label: 'چاه‌های پایش' },
+                { key: 'extraction', label: 'چاه‌های بهره‌برداری' },
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => setTypeFilter(item.key as GroundwaterWellType)}
+                  className={`px-3 py-2 rounded-xl border text-xs ${
+                    typeFilter === item.key ? 'bg-primary/10 border-primary text-primary' : 'border-slate-200'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
             </div>
-          </label>
+          </div>
           <label className="flex items-center gap-2 text-sm text-slate-600">
             <input type="checkbox" checked={showCriticalLayer} onChange={(e) => setShowCriticalLayer(e.target.checked)} />
             نمایش لایه مناطق بحرانی
@@ -69,67 +71,72 @@ const MapView = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-6">
+        <div className="flex flex-col gap-2">
           <h3 className="text-lg font-semibold text-slate-800">نقشه چاه‌ها و وضعیت آبخوان</h3>
-          <div className="flex items-center gap-4 text-sm text-slate-500">
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: statusColors.normal }}></span> وضعیت عادی
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: statusColors.warning }}></span> نیاز به توجه
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded-full" style={{ backgroundColor: statusColors.critical }}></span> وضعیت بحرانی
-            </span>
-          </div>
+          <p className="text-sm text-slate-500">لایه پایه OSM با مختصات WGS84 (EPSG:4326)</p>
         </div>
-        <div className="relative bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl h-[450px] overflow-hidden border border-slate-200">
-          {showCriticalLayer && (
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle,_rgba(255,99,99,0.4)_0%,_rgba(255,255,255,0)_70%)]"></div>
-          )}
-          {filtered.map((well) => (
-            <button
-              key={well.id}
-              style={{ top: `${well.y}%`, left: `${well.x}%` }}
-              className="absolute -translate-x-1/2 -translate-y-1/2"
-              onClick={() => setSelectedWell(well)}
-            >
-              <span
-                className="w-5 h-5 rounded-full border-2 border-white shadow-lg block"
-                style={{ backgroundColor: statusColors[well.status] }}
-                title={well.id}
-              ></span>
-            </button>
-          ))}
-          {selectedWell && (
-            <div className="absolute top-4 left-4 bg-white rounded-2xl shadow-xl border border-slate-100 p-4 w-64 text-sm space-y-2">
-              <div className="flex items-center justify-between">
-                <p className="font-semibold text-slate-800">{selectedWell.id}</p>
-                <button className="text-xs text-slate-400" onClick={() => setSelectedWell(null)}>
-                  بستن
-                </button>
-              </div>
-              <p className="text-slate-500">{selectedWell.aquifer}</p>
-              <p>آخرین سطح آب: {formatNumber(selectedWell.waterLevel, { maximumFractionDigits: 1, minimumFractionDigits: 1 })} متر</p>
-              <p>نرخ افت سالانه: {formatNumber(selectedWell.decline, { maximumFractionDigits: 2, minimumFractionDigits: 2 })} متر</p>
-              <div>
-                <p className="text-xs text-slate-400 mb-1">روند ۱۲ ماه اخیر</p>
-                <svg viewBox="0 0 100 30" className="w-full h-16 text-primary">
-                  <polyline
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    points={Array.from({ length: 12 }, (_, i) => `${(i / 11) * 100},${15 + Math.sin(i) * 8}`).join(' ')}
-                  />
-                </svg>
+        <GroundwaterMap
+          wells={filteredWells}
+          criticalZones={criticalZones}
+          showCriticalLayer={showCriticalLayer}
+          onSelect={setSelectedWellId}
+        />
+        {selectedWell && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="rounded-2xl border border-slate-100 p-4 bg-slate-50">
+              <h4 className="text-base font-semibold text-slate-800 mb-2">اطلاعات چاه انتخاب‌شده</h4>
+              <dl className="text-sm text-slate-600 space-y-1">
+                <div className="flex justify-between">
+                  <dt>نام چاه</dt>
+                  <dd className="font-semibold text-slate-800">{selectedWell.name}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>دشت / آبخوان</dt>
+                  <dd>{selectedWell.plain}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>نوع</dt>
+                  <dd>{selectedWell.type === 'monitoring' ? 'پایش' : 'بهره‌برداری'}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>وضعیت</dt>
+                  <dd>{statusLabel(selectedWell.status)}</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>آخرین سطح آب</dt>
+                  <dd>{formatNumber(selectedWell.static_water_level_m ?? 0)} متر</dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt>تاریخ آخرین اندازه‌گیری</dt>
+                  <dd>{formatJalali(selectedWell.latestMeasurementDate)}</dd>
+                </div>
+              </dl>
+            </div>
+            <div className="rounded-2xl border border-slate-100 p-4 flex flex-col gap-3">
+              <h4 className="text-base font-semibold text-slate-800">مختصات ژئودتیک</h4>
+              <div className="text-sm text-slate-600">
+                <p>عرض جغرافیایی: {selectedWell.latitude.toFixed(4)}°</p>
+                <p>طول جغرافیایی: {selectedWell.longitude.toFixed(4)}°</p>
+                <p>سیستم مختصات: WGS84 (EPSG:4326)</p>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
+};
+
+const statusLabel = (status: GroundwaterWell['status']) => {
+  switch (status) {
+    case 'warning':
+      return 'نیاز به توجه';
+    case 'critical':
+      return 'بحرانی';
+    default:
+      return 'عادی';
+  }
 };
 
 export default MapView;

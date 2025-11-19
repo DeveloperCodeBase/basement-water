@@ -1,78 +1,119 @@
-export const initialWaterLevelSeries = Array.from({ length: 12 }, (_, idx) => {
-  const monthNames = ['فروردین', 'اردیبهشت', 'خرداد', 'تیر', 'مرداد', 'شهریور', 'مهر', 'آبان', 'آذر', 'دی', 'بهمن', 'اسفند'];
-  const base = -20 - idx * 0.8 + Math.sin(idx / 2) * 0.7;
-  return {
-    name: `${monthNames[idx]} ۱۴۰۲`,
-    observed: parseFloat(base.toFixed(2)),
-    ai: parseFloat((base - 0.3 + Math.random() * 0.4).toFixed(2)),
-  };
+import { GroundwaterMeasurement, GroundwaterWell } from '../types/groundwater';
+import { addDays, nowJalaliIso } from '../utils/date';
+
+export const mockWells: GroundwaterWell[] = [
+  {
+    id: 'well-001',
+    name: 'چاه پایش سمنان ۱',
+    plain: 'دشت سمنان',
+    latitude: 35.576,
+    longitude: 53.395,
+    type: 'monitoring',
+    static_water_level_m: -23.4,
+    annual_decline_mpy: -0.7,
+    status: 'normal',
+    latestMeasurementDate: nowJalaliIso(),
+    qualityIndex: 78,
+  },
+  {
+    id: 'well-002',
+    name: 'چاه پایش گرمسار ۲',
+    plain: 'دشت گرمسار',
+    latitude: 35.218,
+    longitude: 52.348,
+    type: 'monitoring',
+    static_water_level_m: -28.1,
+    annual_decline_mpy: -1.1,
+    status: 'warning',
+    latestMeasurementDate: nowJalaliIso(),
+    qualityIndex: 65,
+  },
+  {
+    id: 'well-003',
+    name: 'چاه بهره‌برداری دامغان ۵',
+    plain: 'دشت دامغان',
+    latitude: 36.162,
+    longitude: 54.343,
+    type: 'extraction',
+    static_water_level_m: -31.8,
+    annual_decline_mpy: -1.6,
+    status: 'critical',
+    latestMeasurementDate: nowJalaliIso(),
+    qualityIndex: 55,
+  },
+];
+
+export const mockMeasurements: GroundwaterMeasurement[] = mockWells.flatMap((well, wellIndex) => {
+  return Array.from({ length: 24 }, (_, idx) => {
+    const timestamp = addDays(new Date().toISOString(), idx * -30);
+    const baseLevel = -20 - wellIndex * 3 - idx * 0.25;
+    return {
+      wellId: well.id,
+      timestamp,
+      water_level_m: parseFloat((baseLevel + Math.sin(idx / 4)).toFixed(2)),
+      predicted_level_m: parseFloat((baseLevel - 0.4).toFixed(2)),
+      rain_mm: Math.max(0, 40 + Math.sin(idx / 3) * 15 + wellIndex * 5),
+      withdrawal_mcm: Math.max(20, 70 + Math.cos(idx / 2) * 10 + wellIndex * 3),
+    };
+  });
 });
+
+export const mockCriticalZones: GeoJSON.FeatureCollection = {
+  type: 'FeatureCollection',
+  features: [
+    {
+      type: 'Feature',
+      properties: { name: 'منطقه بحرانی سمنان' },
+      geometry: {
+        type: 'Polygon',
+        coordinates: [
+          [
+            [53.1, 35.5],
+            [53.5, 35.5],
+            [53.6, 35.8],
+            [53.2, 35.9],
+            [53.1, 35.5],
+          ],
+        ],
+      },
+    },
+  ],
+};
 
 export const alerts = [
-  { id: 1, text: 'افزایش سرعت افت در دشت سمنان', time: '۵ دقیقه پیش', type: 'warning' },
-  { id: 2, text: 'افت بیش از حد آستانه در چاه شماره ۲۳', time: '۲۰ دقیقه پیش', type: 'danger' },
-  { id: 3, text: 'به‌روزرسانی موفق داده‌های پایش', time: '۱ ساعت پیش', type: 'info' },
-  { id: 4, text: 'نیاز به بررسی مجدد پمپ چاه ۴۱', time: '۲ ساعت پیش', type: 'warning' },
-  { id: 5, text: 'اتمام حجم برداشت مجاز در دشت دامغان', time: '۳ ساعت پیش', type: 'danger' },
+  { id: 1, text: 'افزایش سرعت افت در دشت سمنان', timestamp: addDays(new Date().toISOString(), -1) },
+  { id: 2, text: 'افت بیش از حد آستانه در چاه شماره ۲۳', timestamp: addDays(new Date().toISOString(), -2) },
+  { id: 3, text: 'به‌روزرسانی موفق داده‌های پایش', timestamp: addDays(new Date().toISOString(), -3) },
+  { id: 4, text: 'نیاز به بررسی مجدد پمپ چاه ۴۱', timestamp: addDays(new Date().toISOString(), -4) },
+  { id: 5, text: 'اتمام حجم برداشت مجاز در دشت دامغان', timestamp: addDays(new Date().toISOString(), -5) },
 ];
 
-export const declineByPlain = [
-  { name: 'دشت سمنان', value: -0.9 },
-  { name: 'دشت گرمسار', value: -1.3 },
-  { name: 'دشت دامغان', value: -0.7 },
-  { name: 'دشت شاهرود', value: -1.1 },
-  { name: 'دشت آرادان', value: -0.5 },
-];
-
-export const wellMarkers = [
-  { id: 'چاه-۰۱', aquifer: 'دشت سمنان', type: 'monitor', status: 'normal', waterLevel: -24.5, decline: -0.8, x: 40, y: 35 },
-  { id: 'چاه-۰۵', aquifer: 'دشت سمنان', type: 'extraction', status: 'warning', waterLevel: -28.1, decline: -1.3, x: 55, y: 30 },
-  { id: 'چاه-۱۲', aquifer: 'دشت گرمسار', type: 'monitor', status: 'critical', waterLevel: -31.4, decline: -1.8, x: 30, y: 45 },
-  { id: 'چاه-۲۰', aquifer: 'دشت دامغان', type: 'monitor', status: 'normal', waterLevel: -22.0, decline: -0.6, x: 60, y: 55 },
-  { id: 'چاه-۲۷', aquifer: 'دشت شاهرود', type: 'extraction', status: 'warning', waterLevel: -27.3, decline: -1.1, x: 45, y: 65 },
-  { id: 'چاه-۳۳', aquifer: 'دشت آرادان', type: 'monitor', status: 'critical', waterLevel: -33.2, decline: -2.0, x: 25, y: 60 },
-];
-
-export const wellsTable = Array.from({ length: 32 }, (_, idx) => {
-  const plains = ['دشت سمنان', 'دشت گرمسار', 'دشت دامغان', 'دشت شاهرود'];
-  const statuses = ['عادی', 'هشدار', 'بحرانی'];
-  const type = idx % 2 === 0 ? 'پایش' : 'بهره‌برداری';
-  const status = statuses[idx % statuses.length];
-  return {
-    id: `چاه-${(idx + 1).toLocaleString('fa-IR', { useGrouping: false })}`,
-    aquifer: plains[idx % plains.length],
-    type,
-    level: parseFloat((-20 - Math.random() * 15).toFixed(1)),
-    decline: parseFloat((-0.3 - Math.random() * 1.2).toFixed(2)),
-    status,
-  };
-});
-
-export const reportList = [
-  {
-    id: 1,
-    name: 'گزارش ماهانه وضعیت دشت سمنان – فروردین ۱۴۰۳',
-    date: '۱۴۰۳/۰۲/۱۰',
-    creator: 'حسام سمنانی',
-  },
-  {
-    id: 2,
-    name: 'گزارش فصلی پایش دشت گرمسار – بهار ۱۴۰۳',
-    date: '۱۴۰۳/۰۴/۰۲',
-    creator: 'لیلا رحیمی',
-  },
-  {
-    id: 3,
-    name: 'گزارش سالانه وضعیت آبخوان دامغان – ۱۴۰۲',
-    date: '۱۴۰۳/۰۱/۲۵',
-    creator: 'مهدی مرادی',
-  },
-];
+export const overviewStats = {
+  kpis: [
+    { label: 'میانگین سطح آب زیرزمینی', value: -23.4, unit: 'متر', trend: 'down' },
+    { label: 'افت متوسط سالانه', value: -0.65, unit: 'متر/سال', trend: 'down' },
+    { label: 'تعداد چاه‌های پایش فعال', value: mockWells.length, unit: 'چاه', trend: 'up' },
+    { label: 'مناطق در وضعیت بحرانی', value: 5, unit: 'منطقه', trend: 'flat' },
+  ],
+  declineByPlain: [
+    { name: 'دشت سمنان', value: -0.9 },
+    { name: 'دشت گرمسار', value: -1.3 },
+    { name: 'دشت دامغان', value: -0.7 },
+    { name: 'دشت شاهرود', value: -1.1 },
+    { name: 'دشت آرادان', value: -0.5 },
+  ],
+};
 
 export const scenarioTable = [
   { name: 'وضعیت فعلی', decline: -5.2, deficit: 180 },
   { name: 'سناریوی پیشنهادی', decline: -3.4, deficit: 120 },
   { name: 'سناریوی بدبینانه', decline: -7.1, deficit: 260 },
+];
+
+export const reportList = [
+  { id: 1, name: 'گزارش ماهانه وضعیت دشت سمنان – فروردین ۱۴۰۳', creator: 'حسام سمنانی', timestamp: addDays(new Date().toISOString(), -10) },
+  { id: 2, name: 'گزارش فصلی پایش دشت گرمسار – بهار ۱۴۰۳', creator: 'لیلا رحیمی', timestamp: addDays(new Date().toISOString(), -20) },
+  { id: 3, name: 'گزارش سالانه وضعیت آبخوان دامغان – ۱۴۰۲', creator: 'مهدی مرادی', timestamp: addDays(new Date().toISOString(), -40) },
 ];
 
 export const users = [

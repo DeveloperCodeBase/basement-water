@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Area, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { formatNumber, toPersianDigits } from '../utils/format';
+import { formatNumber } from '../utils/format';
+import { addDays, formatJalali } from '../utils/date';
 
 const wells = ['چاه-۱۱', 'چاه-۲۵', 'چاه-۳۲'];
 const models = ['LSTM', 'Random Forest'];
@@ -14,8 +15,9 @@ const AiPredictionView = () => {
     return Array.from({ length: 24 }, (_, idx) => {
       const base = -20 - idx * 0.4 + Math.sin(idx / 2) * 0.7;
       const future = idx >= 15 ? base - 0.5 + Math.random() * 0.5 : base;
+      const date = addDays(new Date().toISOString(), idx * 30);
       return {
-        name: idx < 15 ? `ماه ${toPersianDigits(idx + 1)}` : `پیش‌بینی ${toPersianDigits(idx - 14)}`,
+        name: formatJalali(date, 'MMM YYYY'),
         observed: idx < 15 ? parseFloat(base.toFixed(2)) : null,
         predicted: parseFloat(future.toFixed(2)),
         bandBase: future - 0.7,

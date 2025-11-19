@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
 import { reportList } from '../data/mockData';
+import JalaliDatePicker from '../components/JalaliDatePicker';
+import { addDays, formatJalali } from '../utils/date';
 
 const ReportsView = () => {
   const [reports, setReports] = useState(reportList);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [form, setForm] = useState({ type: 'ماهانه', plain: 'دشت سمنان', range: 'فروردین ۱۴۰۳' });
+  const [form, setForm] = useState({ type: 'ماهانه', plain: 'دشت سمنان' });
+  const [formRange, setFormRange] = useState<[string, string]>([
+    addDays(new Date().toISOString(), -30),
+    new Date().toISOString(),
+  ]);
   const [toast, setToast] = useState('');
 
   useEffect(() => {
@@ -16,8 +22,8 @@ const ReportsView = () => {
   const handleCreate = () => {
     const newReport = {
       id: Date.now(),
-      name: `گزارش ${form.type} ${form.plain} – ${form.range}`,
-      date: 'امروز',
+      name: `گزارش ${form.type} ${form.plain}`,
+      timestamp: formRange[1],
       creator: 'کارشناس سامانه',
     };
     setReports((prev) => [newReport, ...prev]);
@@ -51,7 +57,7 @@ const ReportsView = () => {
               {reports.map((report) => (
                 <tr key={report.id} className="border-b last:border-b-0">
                   <td className="py-3 font-medium text-slate-800">{report.name}</td>
-                  <td className="py-3 text-slate-500">{report.date}</td>
+                  <td className="py-3 text-slate-500">{formatJalali(report.timestamp)}</td>
                   <td className="py-3 text-slate-500">{report.creator}</td>
                   <td className="py-3 text-primary text-lg">⬇️</td>
                 </tr>
@@ -86,10 +92,9 @@ const ReportsView = () => {
                 <option>دشت دامغان</option>
               </select>
             </label>
-            <label className="text-sm text-slate-600 flex flex-col gap-2 mb-6">
-              بازه زمانی
-              <input type="text" className="border border-slate-200 rounded-xl px-3 py-2" value={form.range} onChange={(e) => setForm((prev) => ({ ...prev, range: e.target.value }))} />
-            </label>
+            <div className="mb-6">
+              <JalaliDatePicker label="بازه زمانی" value={formRange} onChange={(val) => Array.isArray(val) && setFormRange(val as [string, string])} range />
+            </div>
             <button className="w-full bg-primary text-white rounded-xl py-3 font-semibold" onClick={handleCreate}>
               ایجاد
             </button>

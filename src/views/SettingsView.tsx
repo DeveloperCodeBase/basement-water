@@ -10,7 +10,8 @@ const SettingsView = () => {
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
         <h3 className="text-lg font-semibold text-slate-800 mb-4">مدیریت کاربران</h3>
-        <table className="w-full text-sm text-right">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-right min-w-[520px]">
           <thead>
             <tr className="text-slate-500 border-b">
               <th className="py-2">نام کاربر</th>
@@ -36,7 +37,8 @@ const SettingsView = () => {
               </tr>
             ))}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 space-y-6">

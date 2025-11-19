@@ -2,14 +2,14 @@ import { FC } from 'react';
 import clsx from 'clsx';
 
 const menuItems = [
-  { id: 'overview', label: 'نمای کلی' },
-  { id: 'map', label: 'نقشه چاه‌ها و آبخوان' },
-  { id: 'timeseries', label: 'نمودارهای زمانی' },
-  { id: 'ai', label: 'پیش‌بینی هوش مصنوعی' },
-  { id: 'scenario', label: 'تحلیل سناریوها' },
-  { id: 'wells', label: 'جدول چاه‌های مشاهده‌ای' },
-  { id: 'reports', label: 'گزارش‌ها' },
-  { id: 'settings', label: 'تنظیمات و کاربران' },
+  { id: 'overview', label: 'نمای کلی', icon: '📊' },
+  { id: 'map', label: 'نقشه چاه‌ها و آبخوان', icon: '🗺️' },
+  { id: 'timeseries', label: 'نمودارهای زمانی', icon: '⏱️' },
+  { id: 'ai', label: 'پیش‌بینی هوش مصنوعی', icon: '🤖' },
+  { id: 'scenario', label: 'تحلیل سناریوها', icon: '🧮' },
+  { id: 'wells', label: 'جدول چاه‌های مشاهده‌ای', icon: '💧' },
+  { id: 'reports', label: 'گزارش‌ها', icon: '📄' },
+  { id: 'settings', label: 'تنظیمات و کاربران', icon: '⚙️' },
 ];
 
 interface Props {
@@ -23,7 +23,7 @@ const Sidebar: FC<Props> = ({ currentView, onNavigate, collapsed, onToggle }) =>
   return (
     <aside
       className={clsx(
-        'bg-white shadow-lg border-l border-slate-100 flex flex-col transition-all duration-300',
+        'bg-white shadow-lg border-s border-slate-100 flex flex-col transition-all duration-300 h-full',
         collapsed ? 'w-20' : 'w-64'
       )}
     >
@@ -33,20 +33,22 @@ const Sidebar: FC<Props> = ({ currentView, onNavigate, collapsed, onToggle }) =>
       >
         {collapsed ? 'باز کردن' : 'جمع کردن'}
       </button>
-      <nav className="flex-1 overflow-y-auto">
+      <nav className="flex-1 overflow-y-auto" aria-label="منوی اصلی">
         <ul className="px-2 space-y-1">
           {menuItems.map((item) => (
             <li key={item.id}>
               <button
                 onClick={() => onNavigate(item.id)}
                 className={clsx(
-                  'w-full flex items-center text-right px-4 py-3 rounded-xl text-sm font-medium',
+                  'w-full flex items-center text-right px-4 py-3 rounded-xl text-sm font-medium gap-2',
+                  collapsed ? 'justify-center' : 'justify-between',
                   currentView === item.id
                     ? 'bg-gradient-to-l from-primary/90 to-accent/80 text-white shadow'
                     : 'text-slate-600 hover:bg-slate-50'
                 )}
               >
-                <span className={collapsed ? 'text-[10px]' : undefined}>{item.label}</span>
+                <span className="text-lg">{item.icon}</span>
+                {!collapsed && <span className="flex-1 text-right">{item.label}</span>}
               </button>
             </li>
           ))}

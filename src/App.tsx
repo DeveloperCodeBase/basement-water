@@ -52,24 +52,17 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-slate-50" dir="rtl">
-      <TopBar />
-      <div className="flex flex-row-reverse">
-        <div className="hidden lg:flex">{sidebarElement}</div>
-        <main className="flex-1 p-4 md:p-6 space-y-6">
-          <div className="lg:hidden">
-            <button
-              className="px-4 py-2 rounded-xl bg-white border border-slate-200 shadow-sm text-sm"
-              onClick={() => setMobileSidebar(true)}
-            >
-              منو
-            </button>
-          </div>
+      <TopBar onToggleMenu={() => setMobileSidebar(true)} />
+      <div className="flex flex-row-reverse max-w-7xl mx-auto w-full">
+        <div className="hidden lg:flex lg:w-72 xl:w-80 border-s border-slate-100">{sidebarElement}</div>
+        <main className="flex-1 px-3 sm:px-6 py-4 lg:py-6 space-y-6">
           {renderView()}
         </main>
       </div>
       {mobileSidebar && (
-        <div className="fixed inset-0 bg-black/40 z-40 flex justify-end" onClick={() => setMobileSidebar(false)}>
-          <div className="w-72 max-w-full" onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-40 lg:hidden flex" aria-modal="true" role="dialog">
+          <div className="flex-1 bg-black/40" onClick={() => setMobileSidebar(false)}></div>
+          <div className="w-72 max-w-full bg-white shadow-xl">
             {sidebarElement}
           </div>
         </div>
